@@ -82,14 +82,20 @@ public class GameController {
                             emptyPlanet.add(currentPlanet);
                         }
                         if (!response.isProcessFurther()) {
-                            path = dijkstraShortestPath.getPath(currentPlanet, "Eden");
-                            edgePath = path.getEdgeList();
-                            for (DefaultWeightedEdge edge : edgePath) {
-                                planet.add(String.valueOf(graph.getEdgeTarget(edge)));
+//                            path = dijkstraShortestPath.getPath(currentPlanet, "Eden");
+//                            edgePath = path.getEdgeList();
+//                            for (DefaultWeightedEdge edge : edgePath) {
+//                                planet.add(String.valueOf(graph.getEdgeTarget(edge)));
+//                                graph.setEdgeWeight(edge, graph.getEdgeWeight(edge) + 10);
+//                            }
+                            List<String> edenPath = dijkstraShortestPath.getPath(currentPlanet, "Eden").getVertexList();
+                            currentPlanet = "Eden";
+                            for (int i = 0; i < edenPath.size() - 1; i++) {
+                                var edge = graph.getEdge(edenPath.get(i), edenPath.get(i + 1));
                                 graph.setEdgeWeight(edge, graph.getEdgeWeight(edge) + 10);
                             }
-                            currentPlanet = "Eden";
-                            p = new Planets(planet.stream().toList());
+                            edenPath.remove(0);
+                            p = new Planets(edenPath.stream().toList());
                             data = gson.toJson(p);
                             planet.clear();
                             sendRequestToTravel("/travel", data);
