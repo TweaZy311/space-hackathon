@@ -18,7 +18,7 @@ public class GameController {
 
     Gson gson = new Gson();
     private DefaultDirectedWeightedGraph graph;
-    private String currentPlanet = "Eden";
+    private String currentPlanet = "Earth";
     private Set<String> planets = new LinkedHashSet<>();
     private final String URL = "https://datsedenspace.datsteam.dev/player";
     private final String TOKEN = "66044c57de11b66044c57de121";
@@ -88,6 +88,20 @@ public class GameController {
 //                                planet.add(String.valueOf(graph.getEdgeTarget(edge)));
 //                                graph.setEdgeWeight(edge, graph.getEdgeWeight(edge) + 10);
 //                            }
+                            List<String> edenPath = dijkstraShortestPath.getPath(currentPlanet, "Eden").getVertexList();
+                            currentPlanet = "Eden";
+                            for (int i = 0; i < edenPath.size() - 1; i++) {
+                                var edge = graph.getEdge(edenPath.get(i), edenPath.get(i + 1));
+                                graph.setEdgeWeight(edge, graph.getEdgeWeight(edge) + 10);
+                            }
+                            edenPath.remove(0);
+                            p = new Planets(edenPath.stream().toList());
+                            data = gson.toJson(p);
+                            planet.clear();
+                            sendRequestToTravel("/travel", data);
+                            System.out.println("EDEN TRAVEL");
+                        }
+                        if (emptyPlanet.size() == 99) {
                             List<String> edenPath = dijkstraShortestPath.getPath(currentPlanet, "Eden").getVertexList();
                             currentPlanet = "Eden";
                             for (int i = 0; i < edenPath.size() - 1; i++) {

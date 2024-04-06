@@ -171,7 +171,7 @@ def process_garbage():
     }
 
     # print("PLANET END\n\n\n\n")
-    print(f'STATUS CODE: {response.status_code}. BODY: {response.text}')
+    print(f'STATUS CODE: {response.status_code}.')
     return jsonify(result), 200
 
 if __name__ == '__main__':
