@@ -103,8 +103,8 @@ def collect_garbage(board, figures):
   for item in items_taken:  # после всей хуйни удаляем все items_taken из figures, чтобы вернуть актуальный figures
     figures.remove(item)
 
-  print(f'items_taken: {items_taken}')
-  print(f'figures: {figures}')
+  # print(f'items_taken: {items_taken}')
+  # print(f'figures: {figures}')
   
 
   # 3. Производим первоначальную загрузку
@@ -122,7 +122,7 @@ def collect_garbage(board, figures):
 
   
   # 4. Дозагрузка
-  print('Переходим на дозагрузку')
+  # print('Переходим на дозагрузку')
   items_taken = []
   for figure in figures:
     figure_placed = False
@@ -144,10 +144,10 @@ def collect_garbage(board, figures):
   items_taken = []
 
 
-  for arr in board:
-    print(arr)
-  print(f'items_taken: {items_taken}')
-  print(f'figures: {figures}')
+  # for arr in board:
+  #   print(arr)
+  # print(f'items_taken: {items_taken}')
+  # print(f'figures: {figures}')
 
 
   return board

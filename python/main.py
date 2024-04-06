@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/process_garbage', methods=['POST'])
 def process_garbage():
-    print("PLANET START")
+    # print("PLANET START")
     # Получаем JSON из тела запроса
     request_data = request.json
     
@@ -61,7 +61,7 @@ def process_garbage():
     # print(f'figures: {figures}')
     
     # Производим первоначальную загрузку
-    print('Первоначальная загрузка')
+    # print('Первоначальная загрузка')
     for y in range(len(board)):
         for x in range(len(board[0])):
             if board[y][x] == 0:
@@ -70,7 +70,7 @@ def process_garbage():
                     status, coords = can_fit(board, cell, items_taken[key])
                     if status:
                         board = place_figure(board, key, coords)
-                        print('Figure placed!')
+                        # print('Figure placed!')
                         del items_taken[key]
                         break
     # print('После первоначальной загрузки:')
@@ -118,8 +118,8 @@ def process_garbage():
     occupancy = s / (len(board) * len(board[0]))
     process_further = (occupancy < 0.65)
 
-    print(f'{'Планета пуста' if planet_is_empty else 'На планете остался мусор'}')
-    print(f'Заполненность: {occupancy}')
+    # print(f'{'Планета пуста' if planet_is_empty else 'На планете остался мусор'}')
+    # print(f'Заполненность: {occupancy}')
     
     # Заполнение дикта для JSONa для запроса на сервер хакатона
     request_board = {"garbage": {}}
@@ -148,20 +148,20 @@ def process_garbage():
     response = requests.post(URL, headers=headers, json=request_board)
 
     # Получение статуса и тела ответа
-    status_code = response.status_code
-    response_body = response.text
+    # status_code = response.status_code
+    # response_body = response.text
 
     # Печать статуса и тела ответа
     # print("Status Code:", status_code)
     # print("Response Body:", response_body)
 
-    if status_code == 400:
-        print(response_body)
-        print("start_planet_garbage:")
-        print(start_planet_garbage)
-        print("\n")
-        print("request_board:")
-        print(request_board)
+    # if status_code == 400:
+    #     print(response_body)
+    #     print("start_planet_garbage:")
+    #     print(start_planet_garbage)
+    #     print("\n")
+    #     print("request_board:")
+    #     print(request_board)
 
     # Возвращаем результат джаве
     result = {
@@ -170,7 +170,8 @@ def process_garbage():
         "occupancy": occupancy
     }
 
-    print("PLANET END\n\n\n\n")
+    # print("PLANET END\n\n\n\n")
+    print(f'STATUS CODE: {response.status_code}. BODY: {response.text}')
     return jsonify(result), 200
 
 if __name__ == '__main__':
