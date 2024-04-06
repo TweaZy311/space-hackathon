@@ -9,8 +9,8 @@ public class Ship {
 
     private int capacityX;
     private int capacityY;
-    private int fuelUsed;
-    private Garbage garbage;
-    private Planet planet;
+//    private int fuelUsed;
+//    private Garbage garbage;
+//    private Planet planet;
 
 }

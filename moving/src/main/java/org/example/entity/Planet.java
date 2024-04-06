@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 public class Planet {
 
-    private Garbage garbage;
     private String name;
 
 }

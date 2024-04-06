@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
+import java.util.List;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
-public class Universe {
+public class Planets {
 
-    private ArrayList<FromToPlanet> fromToPlanets;
+    private List<String> planets;
 
 }

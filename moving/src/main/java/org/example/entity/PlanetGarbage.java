@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+import java.util.Map;
+
 @Getter
 @Setter
 @AllArgsConstructor
-public class FromToPlanet {
+public class PlanetGarbage {
 
-    private String from;
-    private String to;
-    private int cost;
+    private Map<String, List<Object>> garbageOnPlanet;
 
 }
