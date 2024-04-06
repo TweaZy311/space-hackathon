@@ -44,13 +44,13 @@ def can_fit(board, cell, figure):
     for _ in range(4):  # Проверяем каждый из четырех поворотов
         initial_cell_x = figure[0][0]
         initial_cell_y = figure[0][1]
-        offset_x = initial_cell_x + cell[0]
-        offset_y = initial_cell_y + cell[1]
-        if 0 <= offset_x < len(board[0]) and 0 <= offset_y < len(board):
-          coordinates = [[offset_x, offset_y]]
-          # print(coordinates)
-        else:
-          break
+        # offset_x = initial_cell_x + cell[0]
+        # offset_y = initial_cell_y + cell[1]
+        # if 0 <= offset_x < len(board[0]) and 0 <= offset_y < len(board):
+        coordinates = [[cell[0], cell[1]]]
+          # print(coordinates)  
+        # else:
+          # break
         for i in range(1, len(figure)):
             new_x = cell[0] + figure[i][0] - initial_cell_x
             new_y = cell[1] + figure[i][1] - initial_cell_y

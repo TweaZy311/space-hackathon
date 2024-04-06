@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 @app.route('/process_garbage', methods=['POST'])
 def process_garbage():
+    print("PLANET START")
     # Получаем JSON из тела запроса
     request_data = request.json
     
@@ -23,11 +24,12 @@ def process_garbage():
 
     # Получаем planet_garbage
     planet_garbage = request_data.get('planetGarbage')
-    print(f'Изначально: {planet_garbage}')
+    # print(f'Изначально: {planet_garbage}')
+    start_planet_garbage = planet_garbage
 
     # Сортируем фигуры из planet_garbage
     figures = {k: v for k, v in sorted(planet_garbage.items(), key=lambda item: len(item[1]))}
-    print(f'После сортировки: {figures}')
+    # print(f'После сортировки: {figures}')
 
     # Если трюм пуст, набираем до 30% трюма
     if is_empty(board):
@@ -54,9 +56,9 @@ def process_garbage():
     # После всей хуйни удаляем все items_taken из figures, чтобы знать актуальный figures
     for key in items_taken:
         del figures[key]
-    print('Прямо перед первоначальной загрузкой')
-    print(f'items_taken: {items_taken}')
-    print(f'figures: {figures}')
+    # print('Прямо перед первоначальной загрузкой')
+    # print(f'items_taken: {items_taken}')
+    # print(f'figures: {figures}')
     
     # Производим первоначальную загрузку
     print('Первоначальная загрузка')
@@ -71,13 +73,13 @@ def process_garbage():
                         print('Figure placed!')
                         del items_taken[key]
                         break
-    print('После первоначальной загрузки:')
-    for arr in board:
-        print(arr)
-    print(f'items_taken: {items_taken}')
+    # print('После первоначальной загрузки:')
+    # for arr in board:
+    #     print(arr)
+    # print(f'items_taken: {items_taken}')
 
     # Дозагрузка
-    print('Дозагрузка')
+    # print('Дозагрузка')
     items_taken = dict()
     for key in figures:
         figure_placed = False
@@ -90,7 +92,7 @@ def process_garbage():
                     status, coords = can_fit(board, cell, figures[key])
                     if status:
                         board = place_figure(board, key, coords)
-                        print('Figure placed!')
+                        # print('Figure placed!')
                         items_taken[key] = figures[key]
                         figure_placed = True
                         break
@@ -99,10 +101,10 @@ def process_garbage():
     items_taken = dict()
 
     # Результат после дозагрузки
-    for arr in board:
-        print(arr)
-    print(f'items_taken: {items_taken}')
-    print(f'figures: {figures}')
+    # for arr in board:
+    #     print(arr)
+    # print(f'items_taken: {items_taken}')
+    # print(f'figures: {figures}')
     
     # Планета пуста для джава контейнера
     planet_is_empty = not figures
@@ -129,8 +131,8 @@ def process_garbage():
                     request_board["garbage"][cell] = []  # Создаем новую запись для мусора
                 request_board["garbage"][cell].append([x, y])  # Добавляем координаты в список
 
-    print('request_board:')
-    print(request_board)
+    # print('request_board:')
+    # print(request_board)
 
     # Отправка JSONa на сервер
     URL = 'https://datsedenspace.datsteam.dev/player/collect'
@@ -141,7 +143,7 @@ def process_garbage():
         'X-Auth-Token': TOKEN,
         'Content-Type': 'application/json'
     }
-
+    
     # Отправка запроса
     response = requests.post(URL, headers=headers, json=request_board)
 
@@ -150,14 +152,25 @@ def process_garbage():
     response_body = response.text
 
     # Печать статуса и тела ответа
-    print("Status Code:", status_code)
-    print("Response Body:", response_body)
+    # print("Status Code:", status_code)
+    # print("Response Body:", response_body)
+
+    if status_code == 400:
+        print(response_body)
+        print("start_planet_garbage:")
+        print(start_planet_garbage)
+        print("\n")
+        print("request_board:")
+        print(request_board)
 
     # Возвращаем результат джаве
     result = {
         "planetIsEmpty": planet_is_empty,
-        "ProcessFurther": process_further
+        "ProcessFurther": process_further,
+        "occupancy": occupancy
     }
+
+    print("PLANET END\n\n\n\n")
     return jsonify(result), 200
 
 if __name__ == '__main__':

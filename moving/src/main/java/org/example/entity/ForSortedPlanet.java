@@ -2,15 +2,14 @@ package org.example.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
-@Setter
 @Getter
 @AllArgsConstructor
-public class Planets {
+public class ForSortedPlanet {
 
-    public List<String> planets;
+    private List<String> names;
+    private double weight;
 
 }

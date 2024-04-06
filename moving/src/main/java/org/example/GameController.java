@@ -19,15 +19,16 @@ public class GameController {
     Gson gson = new Gson();
     private DefaultDirectedWeightedGraph graph;
     private String currentPlanet = "Eden";
-    private Set<String> planets = new HashSet<>();
+    private Set<String> planets = new LinkedHashSet<>();
     private final String URL = "https://datsedenspace.datsteam.dev/player";
     private final String TOKEN = "66044c57de11b66044c57de121";
     private final String COLLECT_SERVICE_URL = "http://localhost:5000";
+    private Set<String> emptyPlanet;
 
     private int planetsCount;
 
     @GetMapping("/startGame")
-    public ResponseEntity startGame() {
+    public ResponseEntity startGame() throws InterruptedException {
         MainJson mainJson = sendRequestToGetPlanet("/universe");
 //        currentPlanet = mainJson.getPlanet().getName();
         if (mainJson != null) {
@@ -47,18 +48,18 @@ public class GameController {
             for (Object edge : graph.edgeSet()) {
                 string += graph.getEdgeSource(edge) + " -> " + graph.getEdgeTarget(edge) + "<br>";
             }
-            returnHome();
+//            returnHome();
             planetTravel();
             return new ResponseEntity<>(string, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public void planetTravel() {
+    public void planetTravel() throws InterruptedException {
         DijkstraShortestPath dijkstraShortestPath = new DijkstraShortestPath(graph);
         List<DefaultWeightedEdge> edgePath;
         Set<String> planet = new LinkedHashSet<>();
-        Set<String> emptyPlanet = new HashSet<>();
+        emptyPlanet = new HashSet<>();
         emptyPlanet.add("Earth");
         emptyPlanet.add("Eden");
         while (emptyPlanet.size() != planetsCount) {
@@ -66,19 +67,17 @@ public class GameController {
                 if (!emptyPlanet.contains(s)) {
                     var path = dijkstraShortestPath.getPath(currentPlanet, s);
                     if (path != null) {
-                        edgePath = path.getEdgeList();
-                        for (DefaultWeightedEdge edge : edgePath) {
-                            planet.add(String.valueOf(graph.getEdgeTarget(edge)));
+                        Planets p = new Planets(createSortedPlanetList());
+                        for (int i = 0; i < p.getPlanets().size() - 1; i++) {
+                            var edge = graph.getEdge(p.getPlanets().get(i), p.getPlanets().get(i + 1));
                             graph.setEdgeWeight(edge, graph.getEdgeWeight(edge) + 10);
-                            currentPlanet = String.valueOf(graph.getEdgeTarget(edge));
                         }
-                        Planets p = new Planets(planet.stream().toList());
+                        p.planets.remove(0);
                         String data = gson.toJson(p);
                         planet.clear();
                         String travelPlanet = sendRequestToTravel("/travel", data);
-                        System.out.println(travelPlanet);
-//                        System.out.println(gson.toJson(travelPlanet));
                         ResponseFromService response = sendRequestToService(travelPlanet, "/process_garbage");
+                        System.out.println(response.isProcessFurther() + "   " + response.getOccupancy());
                         if (response.isPlanetIsEmpty()) {
                             emptyPlanet.add(currentPlanet);
                         }
@@ -94,11 +93,35 @@ public class GameController {
                             data = gson.toJson(p);
                             planet.clear();
                             sendRequestToTravel("/travel", data);
+                            System.out.println("EDEN TRAVEL");
                         }
+                        System.out.println(emptyPlanet.size());
+                        System.out.println();
                     }
                 }
+                Thread.sleep(500);
             }
         }
+    }
+
+    public List<String> createSortedPlanetList() {
+        DijkstraShortestPath dijkstraShortestPath = new DijkstraShortestPath(graph);
+        List<String> allPlanets = planets.stream()
+                .filter(t -> (!t.equals("Earth") && !t.equals("Eden") && !t.equals(currentPlanet))).toList();
+        List<DefaultWeightedEdge> edgePath;
+        List<ForSortedPlanet> sortedPlanetsRoutes = new ArrayList<>();
+        String from = currentPlanet, to;
+        double weightSum = 0;
+        for (String s : allPlanets) {
+            if (!emptyPlanet.contains(s)) {
+                weightSum = dijkstraShortestPath.getPath(currentPlanet, s).getWeight();
+                List<String> temp = dijkstraShortestPath.getPath(currentPlanet, s).getVertexList();
+                sortedPlanetsRoutes.add(new ForSortedPlanet(temp, weightSum));
+            }
+        }
+        sortedPlanetsRoutes.sort(Comparator.comparingDouble(ForSortedPlanet::getWeight));
+        currentPlanet = sortedPlanetsRoutes.get(0).getNames().get(sortedPlanetsRoutes.get(0).getNames().size() - 1);
+        return sortedPlanetsRoutes.get(0).getNames();
     }
 
     public ResponseFromService sendRequestToService(String data, String endpoint) {
@@ -108,6 +131,7 @@ public class GameController {
         HttpEntity<String> entity = new HttpEntity<>(data, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(COLLECT_SERVICE_URL + endpoint, entity, String.class);
         String json = response.getBody();
+        System.out.print(json);
         ResponseFromService responseFromService = gson.fromJson(json, ResponseFromService.class);
         return responseFromService;
     }
