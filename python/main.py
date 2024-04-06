@@ -31,6 +31,17 @@ def process_garbage():
     figures = {k: v for k, v in sorted(planet_garbage.items(), key=lambda item: len(item[1]))}
     # print(f'После сортировки: {figures}')
 
+    def figure_size(figures, key):
+        return len(figures[key])
+
+    def empty_space(board):
+        s = 0
+        for arr in board:
+            for cell in arr:
+                if cell != 0:
+                    s += 1
+        return 88 - s
+
     # Если трюм пуст, набираем до 30% трюма
     if is_empty(board):
         items_taken = dict()
@@ -83,6 +94,8 @@ def process_garbage():
     items_taken = dict()
     for key in figures:
         figure_placed = False
+        if figure_size(figures, key) > empty_space(board):
+            break
         for y in range(len(board)):
             if figure_placed:
                 break

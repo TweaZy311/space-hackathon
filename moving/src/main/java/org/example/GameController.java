@@ -26,6 +26,8 @@ public class GameController {
     private Set<String> emptyPlanet;
 
     private int planetsCount;
+    private String previousOc = "";
+    private int previousCounter = 0;
 
     @GetMapping("/startGame")
     public ResponseEntity startGame() throws InterruptedException {
@@ -78,16 +80,14 @@ public class GameController {
                         String travelPlanet = sendRequestToTravel("/travel", data);
                         ResponseFromService response = sendRequestToService(travelPlanet, "/process_garbage");
                         System.out.println(response.isProcessFurther() + "   " + response.getOccupancy());
-                        if (response.isPlanetIsEmpty()) {
-                            emptyPlanet.add(currentPlanet);
+                        if (previousOc.equals(response.getOccupancy())) {
+                            previousCounter++;
                         }
-                        if (!response.isProcessFurther()) {
-//                            path = dijkstraShortestPath.getPath(currentPlanet, "Eden");
-//                            edgePath = path.getEdgeList();
-//                            for (DefaultWeightedEdge edge : edgePath) {
-//                                planet.add(String.valueOf(graph.getEdgeTarget(edge)));
-//                                graph.setEdgeWeight(edge, graph.getEdgeWeight(edge) + 10);
-//                            }
+
+                        previousOc = response.getOccupancy();
+
+                        if (previousCounter == 4) {
+                            previousCounter = 0;
                             List<String> edenPath = dijkstraShortestPath.getPath(currentPlanet, "Eden").getVertexList();
                             currentPlanet = "Eden";
                             for (int i = 0; i < edenPath.size() - 1; i++) {
@@ -100,8 +100,30 @@ public class GameController {
                             planet.clear();
                             sendRequestToTravel("/travel", data);
                             System.out.println("EDEN TRAVEL");
+                            break;
                         }
+
+                        if (response.isPlanetIsEmpty()) {
+                            emptyPlanet.add(currentPlanet);
+                        }
+
                         if (emptyPlanet.size() == 99) {
+                            List<String> edenPath = dijkstraShortestPath.getPath(currentPlanet, "Eden").getVertexList();
+                            currentPlanet = "Eden";
+                            for (int i = 0; i < edenPath.size() - 1; i++) {
+                                var edge = graph.getEdge(edenPath.get(i), edenPath.get(i + 1));
+                                graph.setEdgeWeight(edge, graph.getEdgeWeight(edge) + 10);
+                            }
+                            edenPath.remove(0);
+                            p = new Planets(edenPath.stream().toList());
+                            data = gson.toJson(p);
+                            planet.clear();
+                            sendRequestToTravel("/travel", data);
+                            System.out.println("EDEN TRAVEL");
+                            break;
+                        }
+
+                        if (!response.isProcessFurther()) {
                             List<String> edenPath = dijkstraShortestPath.getPath(currentPlanet, "Eden").getVertexList();
                             currentPlanet = "Eden";
                             for (int i = 0; i < edenPath.size() - 1; i++) {
