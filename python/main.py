@@ -129,7 +129,7 @@ def process_garbage():
             if cell != 0:
                 s += 1
     occupancy = s / (len(board) * len(board[0]))
-    process_further = (occupancy < 0.65)
+    process_further = (occupancy < 0.7)
 
     # print(f'{'Планета пуста' if planet_is_empty else 'На планете остался мусор'}')
     # print(f'Заполненность: {occupancy}')

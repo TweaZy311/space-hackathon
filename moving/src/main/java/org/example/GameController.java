@@ -18,7 +18,7 @@ public class GameController {
 
     Gson gson = new Gson();
     private DefaultDirectedWeightedGraph graph;
-    private String currentPlanet = "Earth";
+    private String currentPlanet = "ZBEWTPSM9";
     private Set<String> planets = new LinkedHashSet<>();
     private final String URL = "https://datsedenspace.datsteam.dev/player";
     private final String TOKEN = "66044c57de11b66044c57de121";
@@ -32,7 +32,6 @@ public class GameController {
     @GetMapping("/startGame")
     public ResponseEntity startGame() throws InterruptedException {
         MainJson mainJson = sendRequestToGetPlanet("/universe");
-//        currentPlanet = mainJson.getPlanet().getName();
         if (mainJson != null) {
             graph = new DefaultDirectedWeightedGraph<>(DefaultWeightedEdge.class);
             for (List<Object> fromToPlanet : mainJson.getUniverse()) {
@@ -50,7 +49,6 @@ public class GameController {
             for (Object edge : graph.edgeSet()) {
                 string += graph.getEdgeSource(edge) + " -> " + graph.getEdgeTarget(edge) + "<br>";
             }
-//            returnHome();
             planetTravel();
             return new ResponseEntity<>(string, HttpStatus.OK);
         }
@@ -86,7 +84,7 @@ public class GameController {
 
                         previousOc = response.getOccupancy();
 
-                        if (previousCounter == 4) {
+                        if (previousCounter == 3) {
                             previousCounter = 0;
                             List<String> edenPath = dijkstraShortestPath.getPath(currentPlanet, "Eden").getVertexList();
                             currentPlanet = "Eden";
@@ -141,7 +139,7 @@ public class GameController {
                         System.out.println();
                     }
                 }
-                Thread.sleep(500);
+                Thread.sleep(250);
             }
         }
     }
